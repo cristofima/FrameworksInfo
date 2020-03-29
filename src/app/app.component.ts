@@ -1,9 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { GithubService } from './shared/github.service';
 import { DependencyInfoService } from './shared/dependency-info.service';
-
-import * as firebase from 'firebase';
-import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -37,9 +33,7 @@ export class AppComponent implements OnInit {
 
   frameworks: any[] = [];
 
-  constructor(private dependencyInfoService: DependencyInfoService) {
-    firebase.initializeApp(environment.firebaseConfig);
-  }
+  constructor(private dependencyInfoService: DependencyInfoService) { }
 
   ngOnInit() {
     this.frameworks = [];
@@ -95,23 +89,6 @@ export class AppComponent implements OnInit {
           });
         }
       }
-      /*this.githubService.getLastestRelease(rep.repo).subscribe((data: any) => {
-        data.framework_name = rep.name;
-        data.language = rep.language;
-        //this.frameworks.push(data);
-
-        const fr = firebase.database().ref('/frameworks').push();
-        fr.set(data);
-      }, error => {
-
-      });*/
     }
-    /*firebase.database().ref('/frameworks').on('value', resp => {
-      resp.forEach((childSnapshot: any) => {
-        const item = childSnapshot.val();
-        item.key = childSnapshot.key;
-        this.frameworks.push(item);
-      });
-    });*/
   }
 }
