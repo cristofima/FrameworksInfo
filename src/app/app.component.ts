@@ -26,10 +26,10 @@ export class AppComponent implements OnInit {
 
   private showList() {
     for (const rep of this.frameworksList) {
-      if (rep.nameDependency) {
+      if (rep.dependencyName) {
         switch (rep.language) {
           case 'JavaScript':
-            this.dependencyInfoService.getNPMInfo(rep.nameDependency).subscribe((data: any) => {
+            this.dependencyInfoService.getNPMInfo(rep.dependencyName).subscribe((data: any) => {
               const lastestVersion = data['dist-tags'].latest;
 
               let dataFramework = {
@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
 
             break;
           case 'Python':
-            this.dependencyInfoService.getPypiInfo(rep.nameDependency).subscribe((resp: any) => {
+            this.dependencyInfoService.getPypiInfo(rep.dependencyName).subscribe((resp: any) => {
               let dataFramework = {
                 framework_name: rep.name,
                 tag_name: resp.info.version,
@@ -58,7 +58,7 @@ export class AppComponent implements OnInit {
 
             break;
           case 'C#':
-            this.dependencyInfoService.getNugetInfo(rep.nameDependency).subscribe((resp: any) => {
+            this.dependencyInfoService.getNugetInfo(rep.dependencyName).subscribe((resp: any) => {
               let dataFramework = {
                 framework_name: rep.name,
                 tag_name: resp.data[0].version,
@@ -78,8 +78,8 @@ export class AppComponent implements OnInit {
 
             break;
           case 'PHP':
-            this.dependencyInfoService.getPackagistInfo(rep.nameDependency).subscribe((resp: any) => {
-              let versionsInfo = resp.packages[rep.nameDependency];
+            this.dependencyInfoService.getPackagistInfo(rep.dependencyName).subscribe((resp: any) => {
+              let versionsInfo = resp.packages[rep.dependencyName];
               let versionKeys = Object.keys(versionsInfo);
               let lastVersionInfo = versionsInfo[versionKeys[versionKeys.length - 1]];
 
@@ -95,7 +95,7 @@ export class AppComponent implements OnInit {
 
             break;
           case 'Ruby':
-            this.dependencyInfoService.getGemInfo(rep.nameDependency).subscribe((resp: any) => {
+            this.dependencyInfoService.getGemInfo(rep.dependencyName).subscribe((resp: any) => {
               let dataFramework = {
                 framework_name: rep.name,
                 tag_name: resp[0].number,
