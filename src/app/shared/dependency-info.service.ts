@@ -25,4 +25,8 @@ export class DependencyInfoService {
   public getPackagistInfo(dependency: string) {
     return this.http.get(`https://repo.packagist.org/p/${dependency}.json`);
   }
+
+  public getNugetExtraInfo(url: string) {
+    return this.http.get(url);
+  }
 }
