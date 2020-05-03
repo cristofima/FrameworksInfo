@@ -1,7 +1,7 @@
 <div class="container">
     <p-table [columns]="columns" [value]="frameworksTable" [responsive]="true">
         <ng-template pTemplate="caption">
-            Lista de Frameworks con versión Realease
+            Lista de Frameworks con versión Release
         </ng-template>
         <ng-template pTemplate="header" let-columns>
             <tr>
@@ -14,7 +14,7 @@
         <ng-template pTemplate="body" let-rowData let-columns="columns">
             <tr>
                 <td *ngFor="let col of columns">
-                    {{rowData[col.field]}}
+                    {{col.field == 'published_at' ? (rowData[col.field] | date:'medium') : rowData[col.field]}}
                 </td>
             </tr>
         </ng-template>
