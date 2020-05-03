@@ -12,11 +12,20 @@ export class AppComponent implements OnInit {
   private frameworksList: FrameworkModel[];
   frameworksTable: any[] = [];
 
+  columns: any[];
+
   constructor(private dependencyInfoService: DependencyInfoService) { }
 
   ngOnInit() {
     this.frameworksTable = [];
     this.frameworksList = [];
+
+    this.columns = [
+      { field: 'framework_name', header: 'Nombre' },
+      { field: 'tag_name', header: 'Última Versión' },
+      { field: 'language', header: 'Lenguaje' },
+      { field: 'published_at', header: 'Fecha Actualización' }
+    ];
 
     this.dependencyInfoService.getFrameworksList().subscribe(data => {
       this.frameworksList = data;

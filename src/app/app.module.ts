@@ -10,6 +10,8 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { environment } from 'src/environments/environment';
 
+import { TableModule } from 'primeng/table';
+
 @NgModule({
   declarations: [
     AppComponent
@@ -20,7 +22,8 @@ import { environment } from 'src/environments/environment';
     HttpClientModule,
     BrowserAnimationsModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
-    AngularFirestoreModule
+    AngularFirestoreModule,
+    TableModule
   ],
   providers: [],
   bootstrap: [AppComponent]
