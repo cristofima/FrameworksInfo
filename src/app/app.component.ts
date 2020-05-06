@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { DependencyInfoService } from './shared/services/dependency-info.service';
 import { FrameworkModel } from './shared/models/framework.model';
+import { XmlUtil } from './shared/utils/xml.util';
+import { DateUtil } from './shared/utils/date.util';
 
 @Component({
   selector: 'app-root',
@@ -113,6 +115,25 @@ export class AppComponent implements OnInit {
               }
 
               this.frameworksTable.push(dataFramework);
+            });
+            break;
+          case 'Java':
+            this.dependencyInfoService.getMavenInfo(rep.dependencyName).subscribe((resp: any) => {
+              XmlUtil.parseXML(resp, 'metadata')
+                .then((data: any) => {
+                  let versioning = data.versioning[0];
+
+                  let numberDate: string = versioning.lastUpdated[0];
+
+                  let dataFramework = {
+                    framework_name: rep.name,
+                    tag_name: versioning.release,
+                    language: 'Java',
+                    published_at: DateUtil.parseDate(numberDate)
+                  };
+
+                  this.frameworksTable.push(dataFramework);
+                });
             });
             break;
           default:
