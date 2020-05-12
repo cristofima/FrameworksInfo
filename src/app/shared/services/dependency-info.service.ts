@@ -3,7 +3,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { FrameworkModel } from '../models/framework.model';
 import { map } from 'rxjs/operators';
-import { XmlUtil } from '../utils/xml.util';
 
 @Injectable({
   providedIn: 'root'

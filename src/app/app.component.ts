@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { DependencyInfoService } from './shared/services/dependency-info.service';
 import { FrameworkModel } from './shared/models/framework.model';
-import { XmlUtil } from './shared/utils/xml.util';
 import { DateUtil } from './shared/utils/date.util';
+import { NgxXml2jsonService } from 'ngx-xml2json';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +16,9 @@ export class AppComponent implements OnInit {
 
   columns: any[];
 
-  constructor(private dependencyInfoService: DependencyInfoService) { }
+  constructor(
+    private ngxXml2jsonService: NgxXml2jsonService,
+    private dependencyInfoService: DependencyInfoService) { }
 
   ngOnInit() {
     this.frameworksTable = [];
@@ -119,21 +121,27 @@ export class AppComponent implements OnInit {
             break;
           case 'Java':
             this.dependencyInfoService.getMavenInfo(rep.dependencyName).subscribe((resp: any) => {
-              XmlUtil.parseXML(resp, 'metadata')
-                .then((data: any) => {
-                  let versioning = data.versioning[0];
+              const parser = new DOMParser();
+              const xml = parser.parseFromString(resp, 'text/xml');
+              const obj: any = this.ngxXml2jsonService.xmlToJson(xml);
 
-                  let numberDate: string = versioning.lastUpdated[0];
+              if (!obj.metadata) {
+                return;
+              }
 
-                  let dataFramework = {
-                    framework_name: rep.name,
-                    tag_name: versioning.release,
-                    language: 'Java',
-                    published_at: DateUtil.parseDate(numberDate)
-                  };
+              const data = obj.metadata;
 
-                  this.frameworksTable.push(dataFramework);
-                });
+              let versioning = data.versioning;
+              let numberDate: string = versioning.lastUpdated;
+
+              let dataFramework = {
+                framework_name: rep.name,
+                tag_name: versioning.release,
+                language: 'Java',
+                published_at: DateUtil.parseDate(numberDate)
+              };
+
+              this.frameworksTable.push(dataFramework);
             });
             break;
           default:
