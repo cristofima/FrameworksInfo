@@ -91,16 +91,39 @@ export class AppComponent implements OnInit {
 
             break;
           case 'PHP':
+            const validVersionFormat = /^[0-9]+(.[0-9]+)+$/;
+
             this.dependencyInfoService.getPackagistInfo(rep.dependencyName).subscribe((resp: any) => {
               let versionsInfo = resp.packages[rep.dependencyName];
-              let versionKeys = Object.keys(versionsInfo);
-              let lastVersionInfo = versionsInfo[versionKeys[versionKeys.length - 1]];
+              let lastValidVersionInfo: any = null;
+
+              for (const prop in versionsInfo) {
+                if (!versionsInfo.hasOwnProperty(prop)) {
+                  continue;
+                }
+
+                const version_normalized: string = versionsInfo[prop].version_normalized;
+
+                if (validVersionFormat.test(version_normalized)) {
+                  if (lastValidVersionInfo) {
+                    if (lastValidVersionInfo.uid < versionsInfo[prop].uid) {
+                      lastValidVersionInfo = versionsInfo[prop];
+                    }
+                  } else {
+                    lastValidVersionInfo = versionsInfo[prop];
+                  }
+                }
+              }
+
+              if (lastValidVersionInfo == null) {
+                return;
+              }
 
               let dataFramework = {
                 framework_name: rep.name,
-                tag_name: lastVersionInfo.version_normalized,
+                tag_name: lastValidVersionInfo.version_normalized,
                 language: rep.language,
-                published_at: lastVersionInfo.time
+                published_at: lastValidVersionInfo.time
               }
 
               this.frameworksTable.push(dataFramework);
