@@ -3,6 +3,7 @@ import { DependencyInfoService } from './shared/services/dependency-info.service
 import { FrameworkModel } from './shared/models/framework.model';
 import { DateUtil } from './shared/utils/date.util';
 import { NgxXml2jsonService } from 'ngx-xml2json';
+import { SelectItem } from 'primeng/api';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +14,8 @@ export class AppComponent implements OnInit {
 
   private frameworksList: FrameworkModel[];
   frameworksTable: any[] = [];
+
+  languages: SelectItem[];
 
   columns: any[];
 
@@ -30,6 +33,33 @@ export class AppComponent implements OnInit {
       { field: 'language', header: 'Lenguaje' },
       { field: 'published_at', header: 'Fecha Actualización' }
     ];
+
+    this.languages = [
+      {
+        value: 'C#',
+        label: 'C#'
+      },
+      {
+        value: 'Java',
+        label: 'Java'
+      },
+      {
+        value: 'JavaScript',
+        label: 'JavaScript'
+      },
+      {
+        value: 'PHP',
+        label: 'PHP'
+      },
+      {
+        value: 'Python',
+        label: 'Python'
+      },
+      {
+        value: 'Ruby',
+        label: 'Ruby'
+      },
+    ]
 
     this.dependencyInfoService.getFrameworksList().subscribe(data => {
       this.frameworksList = data;

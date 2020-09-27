@@ -1,5 +1,5 @@
 <div class="container">
-    <p-table [columns]="columns" [value]="frameworksTable" [responsive]="true">
+    <p-table #dt [columns]="columns" [value]="frameworksTable" [responsive]="true">
         <ng-template pTemplate="caption">
             Lista de Frameworks con versión Release
         </ng-template>
@@ -10,11 +10,28 @@
                     <p-sortIcon [field]="col.field" ariaLabel="Activate to sort" ariaLabelDesc="Activate to sort in descending order" ariaLabelAsc="Activate to sort in ascending order"></p-sortIcon>
                 </th>
             </tr>
+            <tr>
+                <th>
+                    <input pInputText type="text" (input)="dt.filter($event.target.value, 'framework_name', 'contains')">
+                </th>
+                <th></th>
+                <th>
+                    <p-multiSelect [options]="languages" defaultLabel="Todos los lenguajes" (onChange)="dt.filter($event.value, 'language', 'in')"></p-multiSelect>
+                </th>
+                <th></th>
+            </tr>
         </ng-template>
         <ng-template pTemplate="body" let-rowData let-columns="columns">
             <tr>
                 <td *ngFor="let col of columns">
                     {{col.field == 'published_at' ? (rowData[col.field] | date:'medium') : rowData[col.field]}}
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="4">
+                    No se encontraron resultados
                 </td>
             </tr>
         </ng-template>
