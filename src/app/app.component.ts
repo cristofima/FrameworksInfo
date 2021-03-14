@@ -3,7 +3,7 @@ import { DependencyInfoService } from './shared/services/dependency-info.service
 import { FrameworkModel } from './shared/models/framework.model';
 import { DateUtil } from './shared/utils/date.util';
 import { SelectItem } from 'primeng/api';
-import * as xml2js from 'xml2js';
+import { XmlUtil } from './shared/utils/xml.util';
 
 @Component({
   selector: 'app-root',
@@ -174,32 +174,26 @@ export class AppComponent implements OnInit {
           case 'Java':
             this.dependencyInfoService.getMavenInfo(rep.dependencyName).subscribe((resp: any) => {
               const parser = new DOMParser();
-              const xml = parser.parseFromString(resp, 'text/xml');
+              const srcDOM  = parser.parseFromString(resp, 'application/xml');
+              let obj = XmlUtil.xml2json(srcDOM);
 
-              const parserXml: xml2js.Parser = new xml2js.Parser();
-              parserXml.parseString(xml, (err, result) => {
-                if (!err) {
-                  const obj: any =JSON.stringify(result, null, 4);
+              if (!obj.metadata) {
+                return;
+              }
 
-                  if (!obj.metadata) {
-                    return;
-                  }
-  
-                  const data = obj.metadata;
-  
-                  let versioning = data.versioning;
-                  let numberDate: string = versioning.lastUpdated;
-  
-                  let dataFramework = {
-                    framework_name: rep.name,
-                    tag_name: versioning.release,
-                    language: 'Java',
-                    published_at: DateUtil.parseDate(numberDate)
-                  };
-  
-                  this.frameworksTable.push(dataFramework);
-                }
-              });
+              const data = obj.metadata;
+
+              let versioning = data.versioning;
+              let numberDate: string = versioning.lastUpdated;
+
+              let dataFramework = {
+                framework_name: rep.name,
+                tag_name: versioning.release,
+                language: 'Java',
+                published_at: DateUtil.parseDate(numberDate)
+              };
+
+              this.frameworksTable.push(dataFramework);
             });
             break;
           default:
