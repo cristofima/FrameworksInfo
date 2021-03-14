@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { DependencyInfoService } from './shared/services/dependency-info.service';
 import { FrameworkModel } from './shared/models/framework.model';
 import { DateUtil } from './shared/utils/date.util';
-import { NgxXml2jsonService } from 'ngx-xml2json';
 import { SelectItem } from 'primeng/api';
+import * as xml2js from 'xml2js';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +20,6 @@ export class AppComponent implements OnInit {
   columns: any[];
 
   constructor(
-    private ngxXml2jsonService: NgxXml2jsonService,
     private dependencyInfoService: DependencyInfoService) { }
 
   ngOnInit() {
@@ -176,25 +175,31 @@ export class AppComponent implements OnInit {
             this.dependencyInfoService.getMavenInfo(rep.dependencyName).subscribe((resp: any) => {
               const parser = new DOMParser();
               const xml = parser.parseFromString(resp, 'text/xml');
-              const obj: any = this.ngxXml2jsonService.xmlToJson(xml);
 
-              if (!obj.metadata) {
-                return;
-              }
+              const parserXml: xml2js.Parser = new xml2js.Parser();
+              parserXml.parseString(xml, (err, result) => {
+                if (!err) {
+                  const obj: any =JSON.stringify(result, null, 4);
 
-              const data = obj.metadata;
-
-              let versioning = data.versioning;
-              let numberDate: string = versioning.lastUpdated;
-
-              let dataFramework = {
-                framework_name: rep.name,
-                tag_name: versioning.release,
-                language: 'Java',
-                published_at: DateUtil.parseDate(numberDate)
-              };
-
-              this.frameworksTable.push(dataFramework);
+                  if (!obj.metadata) {
+                    return;
+                  }
+  
+                  const data = obj.metadata;
+  
+                  let versioning = data.versioning;
+                  let numberDate: string = versioning.lastUpdated;
+  
+                  let dataFramework = {
+                    framework_name: rep.name,
+                    tag_name: versioning.release,
+                    language: 'Java',
+                    published_at: DateUtil.parseDate(numberDate)
+                  };
+  
+                  this.frameworksTable.push(dataFramework);
+                }
+              });
             });
             break;
           default:
