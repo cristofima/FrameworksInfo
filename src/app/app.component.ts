@@ -27,10 +27,11 @@ export class AppComponent implements OnInit {
     this.frameworksList = [];
 
     this.columns = [
-      { field: 'framework_name', header: 'Nombre' },
-      { field: 'tag_name', header: 'Última Versión' },
-      { field: 'language', header: 'Lenguaje' },
-      { field: 'published_at', header: 'Fecha Actualización' }
+      { field: 'framework_name', header: 'Name' },
+      { field: 'tag_name', header: 'Last Version' },
+      { field: 'language', header: 'Language' },
+      { field: 'published_at', header: 'Last Update' },
+      { field: 'link', header: 'Links' }
     ];
 
     this.languages = [
@@ -66,6 +67,12 @@ export class AppComponent implements OnInit {
     });
   }
 
+  private setGitHubRepository(dataFramework: any, gitHubRepository: string){
+    if(gitHubRepository){
+      dataFramework["link"] = `https://github.com/${gitHubRepository}`;
+    }
+  }
+
   private showList() {
     for (const rep of this.frameworksList) {
       if (rep.dependencyName) {
@@ -81,6 +88,8 @@ export class AppComponent implements OnInit {
                 published_at: data['time'][lastestVersion]
               }
 
+              this.setGitHubRepository(dataFramework, rep.gitHubRepository);
+
               this.frameworksTable.push(dataFramework);
             });
 
@@ -93,6 +102,8 @@ export class AppComponent implements OnInit {
                 language: rep.language,
                 published_at: resp.releases[resp.info.version][0].upload_time
               }
+
+              this.setGitHubRepository(dataFramework, rep.gitHubRepository);
 
               this.frameworksTable.
                 push(dataFramework);
@@ -107,6 +118,8 @@ export class AppComponent implements OnInit {
                 language: rep.language,
                 published_at: null
               }
+
+              this.setGitHubRepository(dataFramework, rep.gitHubRepository);
 
               const urlJson = resp.data[0].versions[resp.data[0].versions.length - 1]['@id'];
 
@@ -155,6 +168,8 @@ export class AppComponent implements OnInit {
                 published_at: lastValidVersionInfo.time
               }
 
+              this.setGitHubRepository(dataFramework, rep.gitHubRepository);
+
               this.frameworksTable.push(dataFramework);
             });
 
@@ -167,6 +182,8 @@ export class AppComponent implements OnInit {
                 language: rep.language,
                 published_at: resp[0].created_at
               }
+
+              this.setGitHubRepository(dataFramework, rep.gitHubRepository);
 
               this.frameworksTable.push(dataFramework);
             });
@@ -192,6 +209,8 @@ export class AppComponent implements OnInit {
                 language: 'Java',
                 published_at: DateUtil.parseDate(numberDate)
               };
+
+              this.setGitHubRepository(dataFramework, rep.gitHubRepository);
 
               this.frameworksTable.push(dataFramework);
             });
