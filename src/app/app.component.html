@@ -33,7 +33,7 @@
           </ng-container>
           <ng-template #noDateField>
             <ng-container *ngIf="col.field == 'link' && rowData[col.field]; else textField">
-              <a [href]="rowData[col.field]" target="_blank">GitHub</a>
+              <a [href]="rowData[col.field]" target="_blank" rel="noopener">GitHub</a>
             </ng-container>
           </ng-template>
           <ng-template #textField>

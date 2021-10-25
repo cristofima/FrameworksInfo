@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { FrameworkModel } from '../models/framework.model';
 import { map } from 'rxjs/operators';
+import { XmlUtil } from '../utils/xml.util';
+import { DateUtil } from '../utils/date.util';
 
 @Injectable({
   providedIn: 'root'
@@ -42,7 +44,38 @@ export class DependencyInfoService {
   }
 
   public getPackagistInfo(dependency: string) {
-    return this.http.get(`https://repo.packagist.org/p/${dependency}.json`);
+    return this.http.get(`https://repo.packagist.org/p/${dependency}.json`).pipe(
+      map((resp: any) => {
+        if (!resp) {
+          return null;
+        }
+
+        const validVersionFormat = /^[0-9]{1,2}(.[0-9]{1,5}){1,5}$/;
+
+        let versionsInfo = resp.packages[dependency];
+        let lastValidVersionInfo: any = null;
+
+        for (const prop in versionsInfo) {
+          if (!versionsInfo.hasOwnProperty(prop)) {
+            continue;
+          }
+
+          const version_normalized: string = versionsInfo[prop].version_normalized;
+
+          if (validVersionFormat.test(version_normalized)) {
+            if (lastValidVersionInfo) {
+              if (lastValidVersionInfo.uid < versionsInfo[prop].uid) {
+                lastValidVersionInfo = versionsInfo[prop];
+              }
+            } else {
+              lastValidVersionInfo = versionsInfo[prop];
+            }
+          }
+        }
+
+        return lastValidVersionInfo;
+      })
+    );
   }
 
   public getNugetExtraInfo(url: string) {
@@ -58,6 +91,28 @@ export class DependencyInfoService {
           .append('Access-Control-Allow-Origin', '*')
           .append('Access-Control-Allow-Headers', "Access-Control-Allow-Headers, Access-Control-Allow-Origin, Access-Control-Request-Method"),
         responseType: 'text'
-      });
+      }).pipe(
+        map((resp: any) => {
+          const parser = new DOMParser();
+          const srcDOM = parser.parseFromString(resp, 'application/xml');
+          let obj = XmlUtil.xml2json(srcDOM);
+
+          if (!obj.metadata) {
+            return null;
+          }
+
+          const data = obj.metadata;
+
+          let versioning = data.versioning;
+          let numberDate: string = versioning.lastUpdated;
+
+          let dataFramework = {
+            tag_name: versioning.release as string,
+            published_at: DateUtil.parseDate(numberDate)
+          };
+
+          return dataFramework;
+        })
+      );
   }
 }
